@@ -251,3 +251,201 @@ These modules will determine:
     permissions 
 
 This step shapes the entire project. 
+
+
+DATABASE DESIGN
+Design the Database Schema 
+
+No implementing it yet. First we design it and document it. 
+
+Your farm system needs several core tables. 
+
+1️⃣ Users Table 
+
+Handles authentication and system users. 
+
+Fields: 
+
+id 
+name 
+email 
+password 
+role 
+created_at 
+updated_at 
+
+Roles might include: 
+
+    admin 
+
+    manager 
+
+    worker 
+
+2️⃣ Animals Table (Livestock) 
+
+id 
+animal_tag 
+species 
+breed 
+gender 
+birth_date 
+health_status 
+created_at 
+updated_at 
+
+Example: 
+
+animal_tag: COW-001 
+species: Cow 
+breed: Friesian 
+
+ 
+
+3️⃣ Animal Health Records 
+
+Tracks treatments and vaccinations. 
+
+id 
+animal_id 
+treatment 
+veterinarian 
+treatment_date 
+notes 
+
+ 
+
+4️⃣ Fields Table 
+
+Represents farm land sections. 
+
+id 
+field_name 
+size 
+location 
+soil_type 
+created_at 
+
+Example: 
+
+Field A 
+5 acres 
+
+ 
+
+5️⃣ Crops Table 
+
+Tracks planted crops. 
+
+id 
+field_id 
+crop_type 
+planting_date 
+expected_harvest 
+actual_harvest 
+yield_quantity 
+
+ 
+
+6️⃣ Inventory Table 
+
+Tracks farm supplies. 
+
+id 
+item_name 
+category 
+quantity 
+unit 
+supplier 
+purchase_date 
+
+Example categories: 
+
+    seeds 
+
+    fertilizer 
+
+    animal_feed 
+
+    chemicals 
+
+    tools 
+
+ 
+
+7️⃣ Workers Table 
+
+id 
+name 
+phone 
+role 
+salary 
+hire_date 
+
+ 
+
+8️⃣ Tasks Table 
+
+Assigns work to workers. 
+
+id 
+worker_id 
+task_name 
+description 
+task_date 
+status 
+
+Status: 
+
+    pending 
+
+    in_progress 
+
+    completed 
+
+ 
+
+9️⃣ Equipment Table 
+
+id 
+name 
+type 
+purchase_date 
+status 
+last_maintenance 
+
+ 
+
+🔟 Financial Records Table 
+
+Tracks money. 
+
+id 
+type 
+category 
+amount 
+date 
+description 
+
+Type: 
+
+    income 
+
+    expense 
+
+ 
+
+System Database Overview 
+
+users 
+animals 
+animal_health_records 
+fields 
+crops 
+inventory 
+workers 
+tasks 
+equipment 
+financial_records 
+
+ 
