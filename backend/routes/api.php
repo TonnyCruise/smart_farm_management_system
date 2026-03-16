@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\AnimalHealthRecordController;
 use App\Http\Controllers\FieldController;
+use App\Http\Controllers\CropController;
+
 
 
 Route::get('/test', function () {
@@ -32,3 +34,11 @@ Route::post('/fields', [FieldController::class, 'store']);
 Route::get('/fields/{id}', [FieldController::class, 'show']);
 Route::put('/fields/{id}', [FieldController::class, 'update']);
 Route::delete('/fields/{id}', [FieldController::class, 'destroy']);
+
+// Crop management API
+
+Route::get('/crops', [CropController::class, 'index']);
+Route::post('/crops', [CropController::class, 'store']);
+Route::get('/crops/{id}', [CropController::class, 'show']);
+Route::put('/crops/{id}', [CropController::class, 'update']);
+Route::delete('/crops/{id}', [CropController::class, 'destroy']);
