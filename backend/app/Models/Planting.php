@@ -22,4 +22,9 @@ class Planting extends Model
     {
         return $this->belongsTo(Crop::class);
     }
+
+    public function harvest()
+    {
+        return $this->hasOne(Harvest::class);
+    }
 }
