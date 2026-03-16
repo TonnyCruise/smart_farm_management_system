@@ -15,16 +15,28 @@ class InventoryController extends Controller
 
     // Add stock
     public function store(Request $request)
-    {
-        $request->validate([
-            'input_id' => 'required|exists:inputs,id',
-            'quantity_available' => 'required|numeric'
-        ]);
+{
+    $request->validate([
+        'planting_id' => 'required|exists:plantings,id',
+        'input_id' => 'required|exists:inputs,id',
+        'quantity_used' => 'required|numeric',
+        'usage_date' => 'required|date',
+        'notes' => 'nullable|string'
+    ]);
 
-        $inventory = Inventory::create($request->all());
+    // Create usage record
+    $usage = \App\Models\InputUsage::create($request->all());
 
-        return response()->json($inventory, 201);
+    // Find inventory
+    $inventory = \App\Models\Inventory::where('input_id', $request->input_id)->first();
+
+    if ($inventory) {
+        $inventory->quantity_available -= $request->quantity_used;
+        $inventory->save();
     }
+
+    return response()->json($usage, 201);
+}
 
     // Get single inventory record
     public function show($id)
