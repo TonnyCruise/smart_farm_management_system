@@ -14,4 +14,9 @@ class Animal extends Model
         'birth_date',
         'health_status'
     ];
+
+    public function healthRecords()
+    {
+        return $this->hasMany(AnimalHealthRecord::class);
+    }
 }
