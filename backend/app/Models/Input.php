@@ -17,4 +17,8 @@ class Input extends Model
 {
     return $this->hasMany(InputUsage::class);
 }
+public function inventory()
+{
+    return $this->hasOne(Inventory::class);
+}
 }
