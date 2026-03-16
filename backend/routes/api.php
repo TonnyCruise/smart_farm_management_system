@@ -10,6 +10,7 @@ use App\Http\Controllers\HarvestController;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\InputUsageController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\WorkerController;
 
 
 
@@ -88,3 +89,11 @@ Route::post('/inventories', [InventoryController::class, 'store']);
 Route::get('/inventories/{id}', [InventoryController::class, 'show']);
 Route::put('/inventories/{id}', [InventoryController::class, 'update']);
 Route::delete('/inventories/{id}', [InventoryController::class, 'destroy']);
+
+// Worker management API
+
+Route::get('/workers', [WorkerController::class, 'index']);
+Route::post('/workers', [WorkerController::class, 'store']);
+Route::get('/workers/{id}', [WorkerController::class, 'show']);
+Route::put('/workers/{id}', [WorkerController::class, 'update']);
+Route::delete('/workers/{id}', [WorkerController::class, 'destroy']);
