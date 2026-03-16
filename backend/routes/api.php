@@ -5,6 +5,7 @@ use App\Http\Controllers\AnimalController;
 use App\Http\Controllers\AnimalHealthRecordController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\CropController;
+use App\Http\Controllers\PlantingController;
 
 
 
@@ -42,3 +43,11 @@ Route::post('/crops', [CropController::class, 'store']);
 Route::get('/crops/{id}', [CropController::class, 'show']);
 Route::put('/crops/{id}', [CropController::class, 'update']);
 Route::delete('/crops/{id}', [CropController::class, 'destroy']);
+
+// Planting management API
+
+Route::get('/plantings', [PlantingController::class, 'index']);
+Route::post('/plantings', [PlantingController::class, 'store']);
+Route::get('/plantings/{id}', [PlantingController::class, 'show']);
+Route::put('/plantings/{id}', [PlantingController::class, 'update']);
+Route::delete('/plantings/{id}', [PlantingController::class, 'destroy']);
