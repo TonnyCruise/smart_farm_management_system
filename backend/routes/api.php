@@ -8,6 +8,7 @@ use App\Http\Controllers\CropController;
 use App\Http\Controllers\PlantingController;
 use App\Http\Controllers\HarvestController;
 use App\Http\Controllers\InputController;
+use App\Http\Controllers\InputUsageController;
 
 
 
@@ -70,3 +71,11 @@ Route::post('/inputs', [InputController::class, 'store']);
 Route::get('/inputs/{id}', [InputController::class, 'show']);
 Route::put('/inputs/{id}', [InputController::class, 'update']);
 Route::delete('/inputs/{id}', [InputController::class, 'destroy']);
+
+// inputUsage management API
+
+Route::get('/input-usages', [InputUsageController::class, 'index']);
+Route::post('/input-usages', [InputUsageController::class, 'store']);
+Route::get('/input-usages/{id}', [InputUsageController::class, 'show']);
+Route::put('/input-usages/{id}', [InputUsageController::class, 'update']);
+Route::delete('/input-usages/{id}', [InputUsageController::class, 'destroy']);

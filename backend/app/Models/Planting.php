@@ -27,4 +27,9 @@ class Planting extends Model
     {
         return $this->hasOne(Harvest::class);
     }
+
+    public function inputUsages()
+    {
+        return $this->hasMany(InputUsage::class);
+    }
 }

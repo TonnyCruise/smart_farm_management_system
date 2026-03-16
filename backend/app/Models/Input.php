@@ -12,4 +12,9 @@ class Input extends Model
         'unit',
         'cost_per_unit'
     ];
+
+    public function inputUsages()
+{
+    return $this->hasMany(InputUsage::class);
+}
 }
