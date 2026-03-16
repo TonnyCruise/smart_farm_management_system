@@ -11,6 +11,7 @@ use App\Http\Controllers\InputController;
 use App\Http\Controllers\InputUsageController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\WorkerController;
+use App\Http\Controllers\TaskController;
 
 
 
@@ -97,3 +98,11 @@ Route::post('/workers', [WorkerController::class, 'store']);
 Route::get('/workers/{id}', [WorkerController::class, 'show']);
 Route::put('/workers/{id}', [WorkerController::class, 'update']);
 Route::delete('/workers/{id}', [WorkerController::class, 'destroy']);
+
+// Task management API
+
+Route::get('/tasks', [TaskController::class, 'index']);
+Route::post('/tasks', [TaskController::class, 'store']);
+Route::get('/tasks/{id}', [TaskController::class, 'show']);
+Route::put('/tasks/{id}', [TaskController::class, 'update']);
+Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
