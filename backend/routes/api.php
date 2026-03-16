@@ -7,6 +7,7 @@ use App\Http\Controllers\FieldController;
 use App\Http\Controllers\CropController;
 use App\Http\Controllers\PlantingController;
 use App\Http\Controllers\HarvestController;
+use App\Http\Controllers\InputController;
 
 
 
@@ -15,6 +16,7 @@ Route::get('/test', function () {
         'message' => 'API working'
     ]);
 });
+// Animal management API
 
 Route::get('/animals', [AnimalController::class, 'index']);
 Route::post('/animals', [AnimalController::class, 'store']);
@@ -60,3 +62,11 @@ Route::post('/harvests', [HarvestController::class, 'store']);
 Route::get('/harvests/{id}', [HarvestController::class, 'show']);
 Route::put('/harvests/{id}', [HarvestController::class, 'update']);
 Route::delete('/harvests/{id}', [HarvestController::class, 'destroy']);
+
+// Input management API
+
+Route::get('/inputs', [InputController::class, 'index']);
+Route::post('/inputs', [InputController::class, 'store']);
+Route::get('/inputs/{id}', [InputController::class, 'show']);
+Route::put('/inputs/{id}', [InputController::class, 'update']);
+Route::delete('/inputs/{id}', [InputController::class, 'destroy']);
