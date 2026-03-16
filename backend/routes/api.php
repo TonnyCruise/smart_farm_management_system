@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnimalController;
+use App\Http\Controllers\AnimalHealthRecordController;
+use App\Http\Controllers\FieldController;
+
 
 Route::get('/test', function () {
     return response()->json([
@@ -14,3 +17,18 @@ Route::post('/animals', [AnimalController::class, 'store']);
 Route::get('/animals/{id}', [AnimalController::class, 'show']);
 Route::put('/animals/{id}', [AnimalController::class, 'update']);
 Route::delete('/animals/{id}', [AnimalController::class, 'destroy']);
+
+// Health records API
+Route::get('/animals/{animal_id}/health-records', [AnimalHealthRecordController::class, 'index']);
+Route::post('/health-records', [AnimalHealthRecordController::class, 'store']);
+Route::get('/health-records/{id}', [AnimalHealthRecordController::class, 'show']);
+Route::put('/health-records/{id}', [AnimalHealthRecordController::class, 'update']);
+Route::delete('/health-records/{id}', [AnimalHealthRecordController::class, 'destroy']);
+
+// Field management API
+
+Route::get('/fields', [FieldController::class, 'index']);
+Route::post('/fields', [FieldController::class, 'store']);
+Route::get('/fields/{id}', [FieldController::class, 'show']);
+Route::put('/fields/{id}', [FieldController::class, 'update']);
+Route::delete('/fields/{id}', [FieldController::class, 'destroy']);

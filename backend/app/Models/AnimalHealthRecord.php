@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AnimalHealthRecord extends Model
 {
-    //
-     protected $fillable = [
+    // Allow mass assignment
+    protected $fillable = [
         'animal_id',
         'event_type',
         'vet_name',
