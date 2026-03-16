@@ -11,4 +11,9 @@ class Field extends Model
         'size',
         'soil_type'
     ];
+
+    public function plantings()
+    {
+        return $this->hasMany(Planting::class);
+    }
 }

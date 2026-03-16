@@ -10,4 +10,9 @@ class Crop extends Model
         'name',
         'category'
     ];
+
+    public function plantings()
+    {
+        return $this->hasMany(Planting::class);
+    }
 }
