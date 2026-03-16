@@ -9,6 +9,7 @@ use App\Http\Controllers\PlantingController;
 use App\Http\Controllers\HarvestController;
 use App\Http\Controllers\InputController;
 use App\Http\Controllers\InputUsageController;
+use App\Http\Controllers\InventoryController;
 
 
 
@@ -79,3 +80,11 @@ Route::post('/input-usages', [InputUsageController::class, 'store']);
 Route::get('/input-usages/{id}', [InputUsageController::class, 'show']);
 Route::put('/input-usages/{id}', [InputUsageController::class, 'update']);
 Route::delete('/input-usages/{id}', [InputUsageController::class, 'destroy']);
+
+// Inventory management API
+
+Route::get('/inventories', [InventoryController::class, 'index']);
+Route::post('/inventories', [InventoryController::class, 'store']);
+Route::get('/inventories/{id}', [InventoryController::class, 'show']);
+Route::put('/inventories/{id}', [InventoryController::class, 'update']);
+Route::delete('/inventories/{id}', [InventoryController::class, 'destroy']);
