@@ -111,3 +111,4 @@ Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
 // Report API
 
 Route::get('/reports/input-usage-per-field', [ReportController::class, 'inputUsagePerField']);
+Route::get('/reports/harvest-yield-per-field', [ReportController::class, 'harvestYieldPerField']);
