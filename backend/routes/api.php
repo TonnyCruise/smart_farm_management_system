@@ -12,6 +12,7 @@ use App\Http\Controllers\InputUsageController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ReportController;
 
 
 
@@ -106,3 +107,7 @@ Route::post('/tasks', [TaskController::class, 'store']);
 Route::get('/tasks/{id}', [TaskController::class, 'show']);
 Route::put('/tasks/{id}', [TaskController::class, 'update']);
 Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+
+// Report API
+
+Route::get('/reports/input-usage-per-field', [ReportController::class, 'inputUsagePerField']);

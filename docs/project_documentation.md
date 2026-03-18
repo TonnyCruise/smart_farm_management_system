@@ -449,3 +449,18 @@ equipment
 financial_records 
 
  
+ANIMAL MANAGEMENT API
+
+GET /api/animals
+POST /api/animals
+GET /api/animals/{id}
+PUT /api/animals/{id}
+DELETE /api/animals/{id}
+
+Livestock Management
+   └── Animal Management API
+        ├── Create animal
+        ├── List animals
+        ├── View animal
+        ├── Update animal
+        └── Delete animal
