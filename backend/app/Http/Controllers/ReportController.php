@@ -111,4 +111,51 @@ public function profitPerField()
 
     return response()->json($report);
 }
+// Add more report methods as needed FOR dashboard and analytics and show them in the frontend to help farmers make informed decisions about their operations.
+public function dashboard()
+{
+    // Total animals
+    $totalAnimals = \App\Models\Animal::count();
+
+    // Total fields
+    $totalFields = \App\Models\Field::count();
+
+    // Total workers
+    $totalWorkers = \App\Models\Worker::count();
+
+    // Total inputs in stock
+    $totalStock = \App\Models\Inventory::sum('quantity_available');
+
+    // Low stock items
+    $lowStock = \App\Models\Inventory::where('quantity_available', '<', 100)->count();
+
+    // Total harvest yield
+    $totalYield = \App\Models\Harvest::sum('yield_quantity');
+
+    // Total cost
+    $totalCost = \Illuminate\Support\Facades\DB::table('input_usages')
+        ->join('inputs', 'input_usages.input_id', '=', 'inputs.id')
+        ->sum(\Illuminate\Support\Facades\DB::raw('input_usages.quantity_used * inputs.cost_per_unit'));
+
+    // Total revenue
+    $totalRevenue = \Illuminate\Support\Facades\DB::table('harvests')
+        ->join('plantings', 'harvests.planting_id', '=', 'plantings.id')
+        ->join('crops', 'plantings.crop_id', '=', 'crops.id')
+        ->sum(\Illuminate\Support\Facades\DB::raw('harvests.yield_quantity * crops.price_per_unit'));
+
+    // Profit
+    $profit = $totalRevenue - $totalCost;
+
+    return response()->json([
+        'total_animals' => $totalAnimals,
+        'total_fields' => $totalFields,
+        'total_workers' => $totalWorkers,
+        'total_stock' => $totalStock,
+        'low_stock_items' => $lowStock,
+        'total_yield' => $totalYield,
+        'total_cost' => $totalCost,
+        'total_revenue' => $totalRevenue,
+        'profit' => $profit
+    ]);
+}
 }

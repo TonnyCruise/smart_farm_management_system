@@ -116,3 +116,4 @@ Route::get('/reports/low-stock', [ReportController::class, 'lowStock']);
 Route::get('/reports/worker-productivity', [ReportController::class, 'workerProductivity']);
 Route::get('/reports/input-cost-per-field', [ReportController::class, 'inputCostPerField']);
 Route::get('/reports/profit-per-field', [ReportController::class, 'profitPerField']);
+Route::get('/dashboard', [ReportController::class, 'dashboard']);
