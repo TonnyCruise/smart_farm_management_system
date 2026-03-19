@@ -113,3 +113,5 @@ Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
 Route::get('/reports/input-usage-per-field', [ReportController::class, 'inputUsagePerField']);
 Route::get('/reports/harvest-yield-per-field', [ReportController::class, 'harvestYieldPerField']);
 Route::get('/reports/low-stock', [ReportController::class, 'lowStock']);
+Route::get('/reports/worker-productivity', [ReportController::class, 'workerProductivity']);
+Route::get('/reports/input-cost-per-field', [ReportController::class, 'inputCostPerField']);

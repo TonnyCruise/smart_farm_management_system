@@ -69,4 +69,20 @@ public function workerProductivity()
 
     return response()->json($report);
 }
+public function inputCostPerField()
+{
+    $report = \Illuminate\Support\Facades\DB::table('input_usages')
+        ->join('plantings', 'input_usages.planting_id', '=', 'plantings.id')
+        ->join('fields', 'plantings.field_id', '=', 'fields.id')
+        ->join('inputs', 'input_usages.input_id', '=', 'inputs.id')
+        ->select(
+            'fields.id as field_id',
+            'fields.name as field_name',
+            \Illuminate\Support\Facades\DB::raw('SUM(input_usages.quantity_used * inputs.cost_per_unit) as total_cost')
+        )
+        ->groupBy('fields.id', 'fields.name')
+        ->get();
+
+    return response()->json($report);
+}
 }
