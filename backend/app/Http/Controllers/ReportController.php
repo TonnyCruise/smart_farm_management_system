@@ -54,4 +54,19 @@ class ReportController extends Controller
 
     return response()->json($report);
 }
+public function workerProductivity()
+{
+    $report = \Illuminate\Support\Facades\DB::table('tasks')
+        ->join('workers', 'tasks.worker_id', '=', 'workers.id')
+        ->select(
+            'workers.id as worker_id',
+            'workers.name as worker_name',
+            \Illuminate\Support\Facades\DB::raw('COUNT(tasks.id) as total_tasks'),
+            \Illuminate\Support\Facades\DB::raw("SUM(CASE WHEN tasks.status = 'completed' THEN 1 ELSE 0 END) as completed_tasks")
+        )
+        ->groupBy('workers.id', 'workers.name')
+        ->get();
+
+    return response()->json($report);
+}
 }
