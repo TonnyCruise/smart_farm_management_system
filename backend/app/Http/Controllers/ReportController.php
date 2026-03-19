@@ -25,6 +25,7 @@ class ReportController extends Controller
 
         return response()->json($report);
     }
+    // New report method to calculate harvest yield per field
 
     public function harvestYieldPerField()
     {
@@ -43,6 +44,7 @@ class ReportController extends Controller
 
         return response()->json($report);
     }
+    // New report method to identify low stock inputs
 
     public function lowStock(Request $request)
 {
@@ -54,6 +56,7 @@ class ReportController extends Controller
 
     return response()->json($report);
 }
+// New report method to calculate worker productivity
 public function workerProductivity()
 {
     $report = \Illuminate\Support\Facades\DB::table('tasks')
@@ -69,6 +72,7 @@ public function workerProductivity()
 
     return response()->json($report);
 }
+// New report method to calculate input cost per field
 public function inputCostPerField()
 {
     $report = \Illuminate\Support\Facades\DB::table('input_usages')
@@ -79,6 +83,28 @@ public function inputCostPerField()
             'fields.id as field_id',
             'fields.name as field_name',
             \Illuminate\Support\Facades\DB::raw('SUM(input_usages.quantity_used * inputs.cost_per_unit) as total_cost')
+        )
+        ->groupBy('fields.id', 'fields.name')
+        ->get();
+
+    return response()->json($report);
+}
+// Add more report methods as needed this adds price per unit to the crops table and includes it in the crop model, allowing us to calculate the cost of inputs used for each field based on the quantity used and the cost per unit of each input.
+public function profitPerField()
+{
+    $report = \Illuminate\Support\Facades\DB::table('harvests')
+        ->join('plantings', 'harvests.planting_id', '=', 'plantings.id')
+        ->join('fields', 'plantings.field_id', '=', 'fields.id')
+        ->join('crops', 'plantings.crop_id', '=', 'crops.id')
+        ->leftJoin('input_usages', 'plantings.id', '=', 'input_usages.planting_id')
+        ->leftJoin('inputs', 'input_usages.input_id', '=', 'inputs.id')
+        ->select(
+            'fields.id as field_id',
+            'fields.name as field_name',
+            DB::raw('SUM(harvests.yield_quantity * crops.price_per_unit) as revenue'),
+            DB::raw('SUM(input_usages.quantity_used * inputs.cost_per_unit) as cost'),
+            DB::raw('SUM(harvests.yield_quantity * crops.price_per_unit) - 
+                     SUM(input_usages.quantity_used * inputs.cost_per_unit) as profit')
         )
         ->groupBy('fields.id', 'fields.name')
         ->get();
