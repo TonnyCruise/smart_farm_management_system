@@ -43,4 +43,15 @@ class ReportController extends Controller
 
         return response()->json($report);
     }
+
+    public function lowStock(Request $request)
+{
+    $threshold = $request->query('threshold', 100);
+
+    $report = \App\Models\Inventory::with('input')
+        ->where('quantity_available', '<', $threshold)
+        ->get();
+
+    return response()->json($report);
+}
 }
