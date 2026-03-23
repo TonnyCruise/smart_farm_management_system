@@ -5,6 +5,7 @@ import Dashboard from "./Dashboard";
 import Sidebar from "./Sidebar";
 import Animals from "./Animals";
 import Fields from "./Fields";
+import FieldForm from "./FieldForm";
 import Workers from "./Workers";
 
 function App() {
@@ -24,15 +25,17 @@ function App() {
 
   return (
     <Router>
-      <div style={{ display: "flex" }}>
+      <div style={containerStyle}>
         <Sidebar />
 
-        <div style={{ flex: 1, padding: "20px" }}>
+        <div style={mainContentStyle}>
           <Routes>
             <Route path="/dashboard" element={<Dashboard token={token} handleLogout={handleLogout} />} />
             <Route path="/animals" element={<Animals token={token}/>} />
-            <Route path="/fields" element={<Fields />} />
-            <Route path="/workers" element={<Workers />} />
+            <Route path="/fields" element={<Fields token={token} />} />
+            <Route path="/fields/create" element={<FieldForm />} />
+            <Route path="/fields/edit/:id" element={<FieldForm />} />
+            <Route path="/workers" element={<Workers token={token} />} />
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
@@ -40,5 +43,17 @@ function App() {
     </Router>
   );
 }
+
+const containerStyle = {
+  display: "flex",
+  minHeight: "100vh",
+  backgroundColor: "#f5f5f5"
+};
+
+const mainContentStyle = {
+  flex: 1,
+  padding: "20px",
+  overflowY: "auto"
+};
 
 export default App;
