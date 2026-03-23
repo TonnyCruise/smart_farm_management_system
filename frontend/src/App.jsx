@@ -12,6 +12,12 @@ import Tasks from "./Tasks";
 import TaskForm from "./TaskForm";
 import Inputs from "./Inputs";
 import InputForm from "./InputForm";
+import Inventories from "./Inventories";
+import InventoryForm from "./InventoryForm";
+import Plantings from "./Plantings";
+import PlantingForm from "./PlantingForm";
+import Harvests from "./Harvests";
+import HarvestForm from "./HarvestForm";
 import Workers from "./Workers";
 
 function App() {
@@ -49,15 +55,30 @@ function App() {
             <Route path="/crops/create" element={<CropForm />} />
             <Route path="/crops/edit/:id" element={<CropForm />} />
             
-            {/* Tasks */}
-            <Route path="/tasks" element={<Tasks token={token} />} />
-            <Route path="/tasks/create" element={<TaskForm />} />
-            <Route path="/tasks/edit/:id" element={<TaskForm />} />
+            {/* Plantings */}
+            <Route path="/plantings" element={<Plantings token={token} />} />
+            <Route path="/plantings/create" element={<PlantingForm />} />
+            <Route path="/plantings/edit/:id" element={<PlantingForm />} />
+            
+            {/* Harvests */}
+            <Route path="/harvests" element={<Harvests token={token} />} />
+            <Route path="/harvests/create" element={<HarvestForm />} />
+            <Route path="/harvests/edit/:id" element={<HarvestForm />} />
             
             {/* Inputs */}
             <Route path="/inputs" element={<Inputs token={token} />} />
             <Route path="/inputs/create" element={<InputForm />} />
             <Route path="/inputs/edit/:id" element={<InputForm />} />
+            
+            {/* Inventories */}
+            <Route path="/inventories" element={<Inventories token={token} />} />
+            <Route path="/inventories/create" element={<InventoryForm />} />
+            <Route path="/inventories/edit/:id" element={<InventoryForm />} />
+            
+            {/* Tasks */}
+            <Route path="/tasks" element={<Tasks token={token} />} />
+            <Route path="/tasks/create" element={<TaskForm />} />
+            <Route path="/tasks/edit/:id" element={<TaskForm />} />
             
             {/* Workers */}
             <Route path="/workers" element={<Workers token={token} />} />
