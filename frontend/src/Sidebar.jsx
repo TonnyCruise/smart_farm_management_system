@@ -6,17 +6,28 @@ function Sidebar() {
       <h2 style={logoStyle}>Farm System</h2>
 
       <nav>
+        <div style={sectionLabel}>Main Menu</div>
         <Link to="/dashboard" style={linkStyle}>
           <span style={iconStyle}>📊</span> Dashboard
         </Link>
-        <Link to="/animals" style={linkStyle}>
-          <span style={iconStyle}>🐄</span> Animals
-        </Link>
+        
+        <div style={sectionLabel}>Farm Management</div>
         <Link to="/fields" style={linkStyle}>
           <span style={iconStyle}>🌾</span> Fields
         </Link>
-        <Link to="/fields/create" style={linkStyle}>
-          <span style={iconStyle}>➕</span> Add Field
+        <Link to="/crops" style={linkStyle}>
+          <span style={iconStyle}>🌱</span> Crops
+        </Link>
+        <Link to="/tasks" style={linkStyle}>
+          <span style={iconStyle}>✅</span> Tasks
+        </Link>
+        
+        <div style={sectionLabel}>Resources</div>
+        <Link to="/inputs" style={linkStyle}>
+          <span style={iconStyle}>📦</span> Inputs
+        </Link>
+        <Link to="/animals" style={linkStyle}>
+          <span style={iconStyle}>🐄</span> Animals
         </Link>
         <Link to="/workers" style={linkStyle}>
           <span style={iconStyle}>👥</span> Workers
@@ -54,6 +65,14 @@ const linkStyle = {
   borderRadius: "5px",
   transition: "background-color 0.3s",
   fontSize: "15px"
+};
+
+const sectionLabel = {
+  color: "rgba(255,255,255,0.5)",
+  fontSize: "12px",
+  textTransform: "uppercase",
+  padding: "15px 15px 5px",
+  marginTop: "10px"
 };
 
 const iconStyle = {

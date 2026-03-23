@@ -6,6 +6,12 @@ import Sidebar from "./Sidebar";
 import Animals from "./Animals";
 import Fields from "./Fields";
 import FieldForm from "./FieldForm";
+import Crops from "./Crops";
+import CropForm from "./CropForm";
+import Tasks from "./Tasks";
+import TaskForm from "./TaskForm";
+import Inputs from "./Inputs";
+import InputForm from "./InputForm";
 import Workers from "./Workers";
 
 function App() {
@@ -32,10 +38,30 @@ function App() {
           <Routes>
             <Route path="/dashboard" element={<Dashboard token={token} handleLogout={handleLogout} />} />
             <Route path="/animals" element={<Animals token={token}/>} />
+            
+            {/* Fields */}
             <Route path="/fields" element={<Fields token={token} />} />
             <Route path="/fields/create" element={<FieldForm />} />
             <Route path="/fields/edit/:id" element={<FieldForm />} />
+            
+            {/* Crops */}
+            <Route path="/crops" element={<Crops token={token} />} />
+            <Route path="/crops/create" element={<CropForm />} />
+            <Route path="/crops/edit/:id" element={<CropForm />} />
+            
+            {/* Tasks */}
+            <Route path="/tasks" element={<Tasks token={token} />} />
+            <Route path="/tasks/create" element={<TaskForm />} />
+            <Route path="/tasks/edit/:id" element={<TaskForm />} />
+            
+            {/* Inputs */}
+            <Route path="/inputs" element={<Inputs token={token} />} />
+            <Route path="/inputs/create" element={<InputForm />} />
+            <Route path="/inputs/edit/:id" element={<InputForm />} />
+            
+            {/* Workers */}
             <Route path="/workers" element={<Workers token={token} />} />
+            
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
