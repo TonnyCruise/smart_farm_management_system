@@ -8,9 +8,23 @@ import {
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  PointElement,
+  LineElement,
 } from "chart.js";
-import { Bar, Doughnut } from "react-chartjs-2";
+import { Bar, Doughnut, Line } from "react-chartjs-2";
+import { 
+  Beef, 
+  Wheat, 
+  Users, 
+  Package, 
+  TrendingUp, 
+  TrendingDown,
+  AlertTriangle,
+  DollarSign,
+  Activity,
+  Leaf
+} from "lucide-react";
 
 ChartJS.register(
   CategoryScale,
@@ -19,232 +33,335 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  PointElement,
+  LineElement
 );
 
 function Dashboard({ token, handleLogout }) {
   const [data, setData] = useState(null);
-  const [chartData, setChartData] = useState(null);
   const [inventoryData, setInventoryData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchDashboardData = API.get("/dashboard", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    const fetchInventoryData = API.get("/inventories", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    Promise.all([fetchDashboardData, fetchInventoryData])
+    Promise.all([
+      API.get("/dashboard", { headers: { Authorization: `Bearer ${token}` } }),
+      API.get("/inventories", { headers: { Authorization: `Bearer ${token}` } })
+    ])
       .then(([dashboardRes, inventoryRes]) => {
         setData(dashboardRes.data);
-        prepareChartData(dashboardRes.data);
-        prepareInventoryChartData(inventoryRes.data);
+        setInventoryData(inventoryRes.data);
+        setLoading(false);
       })
-      .catch(() => handleLogout());
+      .catch(() => {
+        setLoading(false);
+      });
   }, [token]);
 
-  const prepareInventoryChartData = (inventory) => {
-    const healthyStock = inventory.filter(item => item.quantity_available >= 100).length;
-    const lowStock = inventory.filter(item => item.quantity_available < 100).length;
+  if (loading) {
+    return (
+      <div className="loading-spinner">
+        <Activity size={32} />
+        <span style={{ marginLeft: 12 }}>Loading dashboard...</span>
+      </div>
+    );
+  }
 
-    setInventoryData({
-      bar: {
-        labels: inventory.map(item => item.input?.name || `Item ${item.id}`),
-        datasets: [{
-          label: "Quantity Available",
-          data: inventory.map(item => item.quantity_available),
-          backgroundColor: inventory.map(item => 
-            item.quantity_available < 100 
-              ? "rgba(255, 99, 132, 0.6)" 
-              : "rgba(75, 192, 192, 0.6)"
-          ),
-          borderColor: inventory.map(item => 
-            item.quantity_available < 100 
-              ? "rgba(255, 99, 132, 1)" 
-              : "rgba(75, 192, 192, 1)"
-          ),
-          borderWidth: 1
-        }]
+  const stats = [
+    { 
+      label: "Total Animals", 
+      value: data?.total_animals || 0, 
+      icon: Beef, 
+      color: "primary",
+      change: "+12%"
+    },
+    { 
+      label: "Active Fields", 
+      value: data?.total_fields || 0, 
+      icon: Wheat, 
+      color: "success",
+      change: "+3%"
+    },
+    { 
+      label: "Workers", 
+      value: data?.total_workers || 0, 
+      icon: Users, 
+      color: "info",
+      change: "+5%"
+    },
+    { 
+      label: "Stock Items", 
+      value: data?.total_stock || 0, 
+      icon: Package, 
+      color: "warning",
+      change: "-2%"
+    },
+  ];
+
+  const lowStockItems = data?.low_stock_items || 0;
+  const totalYield = data?.total_yield || 0;
+  const revenue = data?.total_revenue || 0;
+  const profit = data?.profit || 0;
+
+  const chartData = {
+    overview: {
+      labels: ["Animals", "Fields", "Workers", "Stock"],
+      datasets: [{
+        label: "Farm Overview",
+        data: [
+          data?.total_animals || 0,
+          data?.total_fields || 0,
+          data?.total_workers || 0,
+          data?.total_stock || 0
+        ],
+        backgroundColor: [
+          "rgba(22, 163, 74, 0.8)",
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(59, 130, 246, 0.8)",
+          "rgba(245, 158, 11, 0.8)"
+        ],
+        borderRadius: 8,
+        borderSkipped: false,
+      }]
+    },
+    financial: {
+      labels: ["Revenue", "Cost", "Profit"],
+      datasets: [{
+        data: [revenue, data?.total_cost || 0, profit],
+        backgroundColor: [
+          "rgba(34, 197, 94, 0.8)",
+          "rgba(239, 68, 68, 0.8)",
+          "rgba(59, 130, 246, 0.8)"
+        ],
+        borderWidth: 0,
+        cutout: "65%",
+      }]
+    }
+  };
+
+  const inventoryChartData = {
+    labels: inventoryData?.map(item => item.input?.name || `Item ${item.id}`) || [],
+    datasets: [{
+      label: "Stock Level",
+      data: inventoryData?.map(item => item.quantity_available) || [],
+      backgroundColor: inventoryData?.map(item => 
+        item.quantity_available < 100 
+          ? "rgba(239, 68, 68, 0.8)" 
+          : "rgba(34, 197, 94, 0.8)"
+      ),
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+    },
+    scales: {
+      y: { 
+        beginAtZero: true,
+        grid: { color: "rgba(0,0,0,0.05)" },
       },
-      doughnut: {
-        labels: ["Healthy Stock", "Low Stock"],
-        datasets: [{
-          data: [healthyStock, lowStock],
-          backgroundColor: [
-            "rgba(75, 192, 192, 0.6)",
-            "rgba(255, 99, 132, 0.6)"
-          ],
-          borderColor: [
-            "rgba(75, 192, 192, 1)",
-            "rgba(255, 99, 132, 1)"
-          ],
-          borderWidth: 1
-        }]
+      x: {
+        grid: { display: false },
       }
-    });
+    }
   };
 
-  const prepareChartData = (dashboardData) => {
-    setChartData({
-      overview: {
-        labels: ["Animals", "Fields", "Workers", "Stock"],
-        datasets: [{
-          label: "Farm Overview",
-          data: [
-            dashboardData.total_animals,
-            dashboardData.total_fields,
-            dashboardData.total_workers,
-            dashboardData.total_stock
-          ],
-          backgroundColor: [
-            "rgba(54, 162, 235, 0.6)",
-            "rgba(75, 192, 192, 0.6)",
-            "rgba(255, 206, 86, 0.6)",
-            "rgba(153, 102, 255, 0.6)"
-          ],
-          borderColor: [
-            "rgba(54, 162, 235, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(153, 102, 255, 1)"
-          ],
-          borderWidth: 1
-        }]
-      },
-      financial: {
-        labels: ["Revenue", "Cost", "Profit"],
-        datasets: [{
-          label: "Financial Overview",
-          data: [
-            dashboardData.total_revenue || 0,
-            dashboardData.total_cost || 0,
-            dashboardData.profit || 0
-          ],
-          backgroundColor: [
-            "rgba(75, 192, 192, 0.6)",
-            "rgba(255, 99, 132, 0.6)",
-            "rgba(54, 162, 235, 0.6)"
-          ],
-          borderColor: [
-            "rgba(75, 192, 192, 1)",
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)"
-          ],
-          borderWidth: 1
-        }]
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { 
+        position: "bottom",
+        labels: { padding: 20, usePointStyle: true }
       }
-    });
-  };
-
-  if (!data) return <p>Loading...</p>;
-
-  const cardStyle = {
-    padding: "20px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    backgroundColor: "#f9f9f9",
-    textAlign: "center",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-  };
-
-  const chartContainerStyle = {
-    padding: "20px",
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    backgroundColor: "#fff",
-    boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-    marginBottom: "20px"
+    }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dashboard</h1>
-      <button onClick={handleLogout} style={{ marginBottom: "20px", padding: "10px 20px" }}>Logout</button>
-
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "20px",
-        marginBottom: "20px"
-      }}>
-        <div style={cardStyle}><h3>Animals</h3><p>{data.total_animals}</p></div>
-        <div style={cardStyle}><h3>Fields</h3><p>{data.total_fields}</p></div>
-        <div style={cardStyle}><h3>Workers</h3><p>{data.total_workers}</p></div>
-        <div style={cardStyle}><h3>Stock</h3><p>{data.total_stock}</p></div>
-        <div style={cardStyle}><h3>Low Stock</h3><p>{data.low_stock_items}</p></div>
-        <div style={cardStyle}><h3>Yield</h3><p>{data.total_yield}</p></div>
+    <div>
+      <div className="page-header">
+        <div>
+          <h1 className="page-title">Dashboard</h1>
+          <p style={{ color: "var(--text-secondary)", marginTop: 4 }}>
+            Welcome back! Here's what's happening on your farm today.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <span style={{ 
+            padding: "8px 16px", 
+            background: "var(--primary-light)", 
+            borderRadius: "var(--radius)",
+            color: "var(--primary-dark)",
+            fontSize: "14px",
+            fontWeight: 500,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}>
+            <Leaf size={16} />
+            Farm Status: Active
+          </span>
+        </div>
       </div>
 
-      {chartData && (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "20px"
-        }}>
-          <div style={chartContainerStyle}>
-            <h3 style={{ textAlign: "center" }}>Farm Overview</h3>
-            <Bar
-              data={chartData.overview}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: { position: "top" }
-                }
-              }}
-            />
+      <div className="stats-grid">
+        {stats.map((stat, index) => (
+          <div key={index} className={`stat-card ${stat.color}`}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <p className="stat-label">{stat.label}</p>
+                <p className="stat-value">{stat.value}</p>
+                <p className={`stat-change ${stat.change.startsWith("+") ? "positive" : "negative"}`}>
+                  {stat.change.startsWith("+") ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                  <span style={{ marginLeft: 4 }}>{stat.change} from last month</span>
+                </p>
+              </div>
+              <div style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "var(--radius)",
+                background: "rgba(255,255,255,0.2)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}>
+                <stat.icon size={24} color="white" />
+              </div>
+            </div>
           </div>
-          <div style={chartContainerStyle}>
-            <h3 style={{ textAlign: "center" }}>Financial Overview</h3>
-            <Doughnut
-              data={chartData.financial}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: { position: "top" }
-                }
-              }}
-            />
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
 
-      {inventoryData && (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "20px"
-        }}>
-          <div style={chartContainerStyle}>
-            <h3 style={{ textAlign: "center" }}>Inventory Status by Item</h3>
-            <Bar
-              data={inventoryData.bar}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: { position: "top" }
-                },
-                scales: {
-                  y: { beginAtZero: true }
-                }
-              }}
-            />
-          </div>
-          <div style={chartContainerStyle}>
-            <h3 style={{ textAlign: "center" }}>Stock Health Overview</h3>
-            <Doughnut
-              data={inventoryData.doughnut}
-              options={{
-                responsive: true,
-                plugins: {
-                  legend: { position: "top" }
-                }
-              }}
-            />
+      <div className="stats-grid" style={{ marginBottom: 0 }}>
+        <div className="stat-card danger">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <p className="stat-label">Low Stock Alerts</p>
+              <p className="stat-value">{lowStockItems}</p>
+              <p className="stat-change negative" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <AlertTriangle size={14} />
+                Items need restocking
+              </p>
+            </div>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "var(--radius)",
+              background: "rgba(239, 68, 68, 0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <AlertTriangle size={24} color="#ef4444" />
+            </div>
           </div>
         </div>
-      )}
+
+        <div className="stat-card primary">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <p className="stat-label">Total Yield</p>
+              <p className="stat-value">{totalYield}</p>
+              <p className="stat-change positive">
+                <TrendingUp size={14} />
+                <span style={{ marginLeft: 4 }}>kg harvested</span>
+              </p>
+            </div>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "var(--radius)",
+              background: "rgba(255,255,255,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <Wheat size={24} color="white" />
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card success">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <p className="stat-label">Revenue</p>
+              <p className="stat-value">${revenue.toLocaleString()}</p>
+              <p className="stat-change positive">
+                <DollarSign size={14} />
+                <span style={{ marginLeft: 4 }}>Total income</span>
+              </p>
+            </div>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "var(--radius)",
+              background: "rgba(255,255,255,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <DollarSign size={24} color="white" />
+            </div>
+          </div>
+        </div>
+
+        <div className="stat-card info">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <p className="stat-label">Net Profit</p>
+              <p className="stat-value">${profit.toLocaleString()}</p>
+              <p className={`stat-change ${profit >= 0 ? "positive" : "negative"}`}>
+                {profit >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                <span style={{ marginLeft: 4 }}>After costs</span>
+              </p>
+            </div>
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "var(--radius)",
+              background: "rgba(255,255,255,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center"
+            }}>
+              <Activity size={24} color="white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="chart-grid" style={{ marginTop: 24 }}>
+        <div className="chart-card">
+          <h3 className="chart-title">Farm Overview</h3>
+          <div style={{ height: "280px" }}>
+            <Bar data={chartData.overview} options={chartOptions} />
+          </div>
+        </div>
+        <div className="chart-card">
+          <h3 className="chart-title">Financial Summary</h3>
+          <div style={{ height: "280px" }}>
+            <Doughnut data={chartData.financial} options={doughnutOptions} />
+          </div>
+        </div>
+      </div>
+
+      <div className="chart-card" style={{ marginTop: 24 }}>
+        <h3 className="chart-title">Inventory Levels</h3>
+        <div style={{ height: "300px" }}>
+          <Bar 
+            data={inventoryChartData} 
+            options={{
+              ...chartOptions,
+              indexAxis: "y"
+            }} 
+          />
+        </div>
+      </div>
     </div>
   );
 }

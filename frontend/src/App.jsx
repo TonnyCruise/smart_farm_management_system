@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import API from "./api";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
 import Sidebar from "./Sidebar";
@@ -22,66 +23,86 @@ import Workers from "./Workers";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleSetToken = (t) => {
+  useEffect(() => {
+    if (token) {
+      API.get("/me", { headers: { Authorization: `Bearer ${token}` } })
+        .then(res => {
+          setUser(res.data);
+          localStorage.setItem("user", JSON.stringify(res.data));
+        })
+        .catch(() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setToken(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
+
+  const handleSetToken = (t, userData) => {
     localStorage.setItem("token", t);
+    localStorage.setItem("user", JSON.stringify(userData));
     setToken(t);
+    setUser(userData);
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     setToken(null);
+    setUser(null);
   };
 
+  if (loading) return <div className="loading-spinner">Loading...</div>;
   if (!token) return <Login setToken={handleSetToken} />;
+
+  const isAdmin = user?.role === "admin";
+  const isManager = user?.role === "manager";
 
   return (
     <Router>
-      <div style={containerStyle}>
-        <Sidebar />
-
-        <div style={mainContentStyle}>
+      <div className="app-layout">
+        <Sidebar onLogout={handleLogout} user={user} />
+        
+        <div className="main-content">
           <Routes>
             <Route path="/dashboard" element={<Dashboard token={token} handleLogout={handleLogout} />} />
-            <Route path="/animals" element={<Animals token={token}/>} />
+            <Route path="/animals" element={<Animals token={token} canEdit={isAdmin || isManager} />} />
             
-            {/* Fields */}
-            <Route path="/fields" element={<Fields token={token} />} />
-            <Route path="/fields/create" element={<FieldForm />} />
-            <Route path="/fields/edit/:id" element={<FieldForm />} />
+            <Route path="/fields" element={<Fields token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/fields/create" element={isAdmin || isManager ? <FieldForm /> : <Navigate to="/fields" />} />
+            <Route path="/fields/edit/:id" element={isAdmin || isManager ? <FieldForm /> : <Navigate to="/fields" />} />
             
-            {/* Crops */}
-            <Route path="/crops" element={<Crops token={token} />} />
-            <Route path="/crops/create" element={<CropForm />} />
-            <Route path="/crops/edit/:id" element={<CropForm />} />
+            <Route path="/crops" element={<Crops token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/crops/create" element={isAdmin || isManager ? <CropForm /> : <Navigate to="/crops" />} />
+            <Route path="/crops/edit/:id" element={isAdmin || isManager ? <CropForm /> : <Navigate to="/crops" />} />
             
-            {/* Plantings */}
-            <Route path="/plantings" element={<Plantings token={token} />} />
-            <Route path="/plantings/create" element={<PlantingForm />} />
-            <Route path="/plantings/edit/:id" element={<PlantingForm />} />
+            <Route path="/plantings" element={<Plantings token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/plantings/create" element={isAdmin || isManager ? <PlantingForm /> : <Navigate to="/plantings" />} />
+            <Route path="/plantings/edit/:id" element={isAdmin || isManager ? <PlantingForm /> : <Navigate to="/plantings" />} />
             
-            {/* Harvests */}
-            <Route path="/harvests" element={<Harvests token={token} />} />
-            <Route path="/harvests/create" element={<HarvestForm />} />
-            <Route path="/harvests/edit/:id" element={<HarvestForm />} />
+            <Route path="/harvests" element={<Harvests token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/harvests/create" element={isAdmin || isManager ? <HarvestForm /> : <Navigate to="/harvests" />} />
+            <Route path="/harvests/edit/:id" element={isAdmin || isManager ? <HarvestForm /> : <Navigate to="/harvests" />} />
             
-            {/* Inputs */}
-            <Route path="/inputs" element={<Inputs token={token} />} />
-            <Route path="/inputs/create" element={<InputForm />} />
-            <Route path="/inputs/edit/:id" element={<InputForm />} />
+            <Route path="/inputs" element={<Inputs token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/inputs/create" element={isAdmin || isManager ? <InputForm /> : <Navigate to="/inputs" />} />
+            <Route path="/inputs/edit/:id" element={isAdmin || isManager ? <InputForm /> : <Navigate to="/inputs" />} />
             
-            {/* Inventories */}
-            <Route path="/inventories" element={<Inventories token={token} />} />
-            <Route path="/inventories/create" element={<InventoryForm />} />
-            <Route path="/inventories/edit/:id" element={<InventoryForm />} />
+            <Route path="/inventories" element={<Inventories token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/inventories/create" element={isAdmin || isManager ? <InventoryForm /> : <Navigate to="/inventories" />} />
+            <Route path="/inventories/edit/:id" element={isAdmin || isManager ? <InventoryForm /> : <Navigate to="/inventories" />} />
             
-            {/* Tasks */}
-            <Route path="/tasks" element={<Tasks token={token} />} />
+            <Route path="/tasks" element={<Tasks token={token} canEdit={isAdmin || isManager} />} />
             <Route path="/tasks/create" element={<TaskForm />} />
-            <Route path="/tasks/edit/:id" element={<TaskForm />} />
+            <Route path="/tasks/edit/:id" element={isAdmin || isManager ? <TaskForm /> : <Navigate to="/tasks" />} />
             
-            {/* Workers */}
-            <Route path="/workers" element={<Workers token={token} />} />
+            <Route path="/workers" element={isAdmin || isManager ? <Workers token={token} /> : <Navigate to="/dashboard" />} />
             
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
@@ -90,17 +111,5 @@ function App() {
     </Router>
   );
 }
-
-const containerStyle = {
-  display: "flex",
-  minHeight: "100vh",
-  backgroundColor: "#f5f5f5"
-};
-
-const mainContentStyle = {
-  flex: 1,
-  padding: "20px",
-  overflowY: "auto"
-};
 
 export default App;

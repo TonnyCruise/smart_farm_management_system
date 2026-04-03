@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
-export default function Plantings({ token }) {
+export default function Plantings({ token, canEdit }) {
   const [plantings, setPlantings] = useState([]);
   const [error, setError] = useState(null);
 

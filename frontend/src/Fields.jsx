@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
+import { Plus, Pencil, Trash2, Search, MapPin, Maximize2, Waves } from "lucide-react";
 
-export default function Fields({ token }) {
+function Fields({ token, canEdit }) {
   const [fields, setFields] = useState([]);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchFields = async () => {
     try {
@@ -35,144 +37,170 @@ export default function Fields({ token }) {
     }
   };
 
-  const deleteButtonStyle = {
-    padding: "5px 10px",
-    backgroundColor: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer"
-  };
+  const filteredFields = fields.filter(field =>
+    field.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    field.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    field.soil_type?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div>
-      <div style={headerStyle}>
-        <h1>Fields</h1>
-        <Link to="/fields/create" style={addButtonStyle}>
-          + Add New Field
-        </Link>
+      <div className="page-header">
+        <h1 className="page-title">Field Management</h1>
+        {canEdit && (
+          <Link to="/fields/create" className="btn btn-primary">
+            <Plus size={18} />
+            Add Field
+          </Link>
+        )}
       </div>
 
-      {error && <div style={errorStyle}>{error}</div>}
+      {error && <div className="alert alert-error">{error}</div>}
 
-      {fields.length === 0 ? (
-        <div style={emptyStateStyle}>
-          <p>No fields found. Create your first field to get started.</p>
-          <Link to="/fields/create" style={addButtonStyle}>
-            + Add New Field
-          </Link>
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">Farm Fields</h3>
+          <div style={{ position: "relative" }}>
+            <Search size={18} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--text-secondary)" }} />
+            <input
+              type="text"
+              placeholder="Search fields..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ paddingLeft: 40, width: 240 }}
+            />
+          </div>
         </div>
-      ) : (
-        <div style={gridStyle}>
-          {fields.map(field => (
-            <div key={field.id} style={cardStyle}>
-              <div style={cardHeaderStyle}>
-                <h3 style={cardTitleStyle}>{field.name}</h3>
-                <span style={badgeStyle}>{field.size} acres</span>
+
+        {filteredFields.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon"><MapPin size={48} /></div>
+            <h3>No fields found</h3>
+            <p>Start by adding your first field to the registry</p>
+            <Link to="/fields/create" className="btn btn-primary" style={{ marginTop: 16 }}>
+              <Plus size={18} />
+              Add Field
+            </Link>
+          </div>
+        ) : (
+          <div style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", 
+            gap: 20 
+          }}>
+            {filteredFields.map(field => (
+              <div key={field.id} style={fieldCardStyle}>
+                <div style={fieldCardHeader}>
+                  <div style={fieldIcon}>
+                    <Waves size={24} color="white" />
+                  </div>
+                  <div>
+                    <h3 style={fieldTitle}>{field.name}</h3>
+                    <span style={fieldSizeBadge}>
+                      <Maximize2 size={12} />
+                      {field.size} acres
+                    </span>
+                  </div>
+                </div>
+                
+                <div style={fieldCardBody}>
+                  <div style={fieldInfoItem}>
+                    <MapPin size={16} color="var(--text-secondary)" />
+                    <span>{field.location || "No location"}</span>
+                  </div>
+                  <div style={fieldInfoItem}>
+                    <Waves size={16} color="var(--text-secondary)" />
+                    <span>{field.soil_type || "No soil type"}</span>
+                  </div>
+                </div>
+
+                <div style={fieldCardFooter}>
+                  {canEdit && (
+                    <>
+                      <Link to={`/fields/edit/${field.id}`} className="btn btn-secondary btn-sm">
+                        <Pencil size={16} />
+                        Edit
+                      </Link>
+                      <button 
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(field.id)}
+                      >
+                        <Trash2 size={16} />
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-              <div style={cardBodyStyle}>
-                <p><strong>Location:</strong> {field.location || "N/A"}</p>
-                <p><strong>Soil Type:</strong> {field.soil_type || "N/A"}</p>
-              </div>
-              <div style={cardFooterStyle}>
-                <Link to={`/fields/edit/${field.id}`} style={editLinkStyle}>
-                  Edit
-                </Link>
-                <button 
-                  onClick={() => handleDelete(field.id)}
-                  style={deleteButtonStyle}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-const headerStyle = {
+const fieldCardStyle = {
+  background: "var(--bg-card)",
+  borderRadius: "var(--radius-md)",
+  border: "1px solid var(--border)",
+  overflow: "hidden",
+  transition: "all 0.2s ease",
+};
+
+const fieldCardHeader = {
   display: "flex",
-  justifyContent: "space-between",
   alignItems: "center",
-  marginBottom: "20px"
-};
-
-const addButtonStyle = {
-  padding: "10px 20px",
-  backgroundColor: "#28a745",
+  gap: 14,
+  padding: 20,
+  background: "linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)",
   color: "white",
-  textDecoration: "none",
-  borderRadius: "5px",
-  fontWeight: "bold"
 };
 
-const errorStyle = {
-  padding: "10px",
-  backgroundColor: "#f8d7da",
-  color: "#721c24",
-  borderRadius: "5px",
-  marginBottom: "15px"
-};
-
-const emptyStateStyle = {
-  textAlign: "center",
-  padding: "40px",
-  backgroundColor: "#f9f9f9",
-  borderRadius: "10px"
-};
-
-const gridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-  gap: "20px"
-};
-
-const cardStyle = {
-  backgroundColor: "white",
-  borderRadius: "10px",
-  boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-  overflow: "hidden"
-};
-
-const cardHeaderStyle = {
-  padding: "15px",
-  backgroundColor: "#2c3e50",
-  color: "white",
+const fieldIcon = {
+  width: 48,
+  height: 48,
+  borderRadius: "var(--radius)",
+  background: "rgba(255,255,255,0.2)",
   display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center"
+  alignItems: "center",
+  justifyContent: "center",
 };
 
-const cardTitleStyle = {
-  margin: 0,
-  fontSize: "18px"
+const fieldTitle = {
+  fontSize: 18,
+  fontWeight: 600,
+  margin: "0 0 4px",
 };
 
-const badgeStyle = {
-  backgroundColor: "#28a745",
-  padding: "5px 10px",
-  borderRadius: "15px",
-  fontSize: "12px"
+const fieldSizeBadge = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 12,
+  background: "rgba(255,255,255,0.2)",
+  padding: "4px 10px",
+  borderRadius: 20,
 };
 
-const cardBodyStyle = {
-  padding: "15px"
+const fieldCardBody = {
+  padding: 20,
 };
 
-const cardFooterStyle = {
-  padding: "15px",
-  borderTop: "1px solid #eee",
+const fieldInfoItem = {
   display: "flex",
-  justifyContent: "space-between"
+  alignItems: "center",
+  gap: 10,
+  color: "var(--text-secondary)",
+  fontSize: 14,
+  marginBottom: 10,
 };
 
-const editLinkStyle = {
-  padding: "5px 15px",
-  backgroundColor: "#007bff",
-  color: "white",
-  textDecoration: "none",
-  borderRadius: "4px"
+const fieldCardFooter = {
+  padding: "16px 20px",
+  borderTop: "1px solid var(--border-light)",
+  display: "flex",
+  gap: 12,
 };
+
+export default Fields;

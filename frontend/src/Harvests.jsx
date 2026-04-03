@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
-export default function Harvests({ token }) {
+export default function Harvests({ token, canEdit }) {
   const [harvests, setHarvests] = useState([]);
   const [error, setError] = useState(null);
 

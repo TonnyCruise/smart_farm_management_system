@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
-export default function Inventories({ token }) {
+export default function Inventories({ token, canEdit }) {
   const [inventories, setInventories] = useState([]);
   const [error, setError] = useState(null);
 

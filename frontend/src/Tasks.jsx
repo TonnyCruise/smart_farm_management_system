@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
-export default function Tasks({ token }) {
+export default function Tasks({ token, canEdit }) {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
 

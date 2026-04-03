@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
-export default function Inputs({ token }) {
+export default function Inputs({ token, canEdit }) {
   const [inputs, setInputs] = useState([]);
   const [error, setError] = useState(null);
 

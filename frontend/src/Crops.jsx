@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
-export default function Crops({ token }) {
+export default function Crops({ token, canEdit }) {
   const [crops, setCrops] = useState([]);
   const [error, setError] = useState(null);
 
