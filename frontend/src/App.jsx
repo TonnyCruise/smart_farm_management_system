@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import API from "./api";
 import Login from "./Login";
 import Dashboard from "./Dashboard";
@@ -20,6 +20,8 @@ import PlantingForm from "./PlantingForm";
 import Harvests from "./Harvests";
 import HarvestForm from "./HarvestForm";
 import Workers from "./Workers";
+import Equipment from "./Equipment";
+import Finances from "./Finances";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -65,7 +67,7 @@ function App() {
   const isManager = user?.role === "manager";
 
   return (
-    <Router>
+    <>
       <div className="app-layout">
         <Sidebar onLogout={handleLogout} user={user} />
         
@@ -102,13 +104,15 @@ function App() {
             <Route path="/tasks/create" element={<TaskForm />} />
             <Route path="/tasks/edit/:id" element={isAdmin || isManager ? <TaskForm /> : <Navigate to="/tasks" />} />
             
+            <Route path="/equipment" element={<Equipment token={token} canEdit={isAdmin || isManager} />} />
+            <Route path="/finances" element={isAdmin || isManager ? <Finances token={token} canEdit={isAdmin || isManager} /> : <Navigate to="/dashboard" />} />
             <Route path="/workers" element={isAdmin || isManager ? <Workers token={token} /> : <Navigate to="/dashboard" />} />
             
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Routes>
         </div>
       </div>
-    </Router>
+    </>
   );
 }
 

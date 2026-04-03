@@ -10,13 +10,11 @@ import {
   Warehouse,
   TrendingUp,
   LogOut,
-  Shield
+  Wrench,
+  DollarSign
 } from "lucide-react";
 
 function Sidebar({ onLogout, user }) {
-  const isAdmin = user?.role === "admin";
-  const isManager = user?.role === "manager";
-
   const navItems = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["admin", "manager", "worker"] },
     { to: "/fields", icon: Wheat, label: "Fields", roles: ["admin", "manager", "worker"] },
@@ -24,6 +22,8 @@ function Sidebar({ onLogout, user }) {
     { to: "/tasks", icon: CheckSquare, label: "Tasks", roles: ["admin", "manager", "worker"] },
     { to: "/inputs", icon: Package, label: "Inputs", roles: ["admin", "manager", "worker"] },
     { to: "/animals", icon: Beef, label: "Livestock", roles: ["admin", "manager", "worker"] },
+    { to: "/equipment", icon: Wrench, label: "Equipment", roles: ["admin", "manager", "worker"] },
+    { to: "/finances", icon: DollarSign, label: "Finances", roles: ["admin", "manager"] },
     { to: "/workers", icon: Users, label: "Workers", roles: ["admin", "manager"] },
     { to: "/inventories", icon: Warehouse, label: "Inventory", roles: ["admin", "manager", "worker"] },
     { to: "/harvests", icon: TrendingUp, label: "Harvests", roles: ["admin", "manager", "worker"] },

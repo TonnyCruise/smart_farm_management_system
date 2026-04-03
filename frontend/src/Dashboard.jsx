@@ -25,6 +25,7 @@ import {
   Activity,
   Leaf
 } from "lucide-react";
+import WeatherWidget from "./WeatherWidget";
 
 ChartJS.register(
   CategoryScale,
@@ -207,6 +208,10 @@ function Dashboard({ token, handleLogout }) {
             Farm Status: Active
           </span>
         </div>
+      </div>
+
+      <div style={{ marginBottom: 24 }}>
+        <WeatherWidget />
       </div>
 
       <div className="stats-grid">

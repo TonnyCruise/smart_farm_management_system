@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import API from "./api";
 
 function Workers({ token }) {
@@ -13,7 +13,7 @@ function Workers({ token }) {
   });
   const [editingId, setEditingId] = useState(null);
 
-  const fetchWorkers = async () => {
+  const fetchWorkers = useCallback(async () => {
     try {
       const res = await API.get("/workers", {
         headers: { Authorization: `Bearer ${token}` }
@@ -24,11 +24,11 @@ function Workers({ token }) {
       console.error(err);
       setError("Failed to load workers");
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchWorkers();
-  }, [token]);
+  }, [fetchWorkers]);
 
   const handleAdd = async () => {
     if (!form.name || !form.role) {

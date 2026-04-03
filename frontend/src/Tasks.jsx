@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import API from "./api";
 
@@ -6,7 +6,7 @@ export default function Tasks({ token, canEdit }) {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState(null);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const res = await API.get("/tasks", {
         headers: { Authorization: `Bearer ${token}` }
@@ -17,11 +17,11 @@ export default function Tasks({ token, canEdit }) {
       console.error(err);
       setError("Failed to load tasks");
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchTasks();
-  }, [token]);
+  }, [fetchTasks]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
