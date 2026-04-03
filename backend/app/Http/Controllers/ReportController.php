@@ -133,15 +133,22 @@ public function dashboard()
     $totalYield = \App\Models\Harvest::sum('yield_quantity');
 
     // Total cost
-    $totalCost = \Illuminate\Support\Facades\DB::table('input_usages')
+    $harvestCost = \Illuminate\Support\Facades\DB::table('input_usages')
         ->join('inputs', 'input_usages.input_id', '=', 'inputs.id')
         ->sum(\Illuminate\Support\Facades\DB::raw('input_usages.quantity_used * inputs.cost_per_unit'));
 
+    // Total cost
+    $transactionExpense = \App\Models\Transaction::where('type', 'expense')->sum('amount');
+    $totalCost = $harvestCost + $transactionExpense;
+
     // Total revenue
-    $totalRevenue = \Illuminate\Support\Facades\DB::table('harvests')
+    $harvestRevenue = \Illuminate\Support\Facades\DB::table('harvests')
         ->join('plantings', 'harvests.planting_id', '=', 'plantings.id')
         ->join('crops', 'plantings.crop_id', '=', 'crops.id')
         ->sum(\Illuminate\Support\Facades\DB::raw('harvests.yield_quantity * crops.price_per_unit'));
+
+    $transactionIncome = \App\Models\Transaction::where('type', 'income')->sum('amount');
+    $totalRevenue = $harvestRevenue + $transactionIncome;
 
     // Profit
     $profit = $totalRevenue - $totalCost;

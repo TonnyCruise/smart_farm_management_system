@@ -14,6 +14,8 @@ use App\Http\Controllers\WorkerController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\TransactionController;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'API working']);
@@ -105,6 +107,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/inventories/{id}', [InventoryController::class, 'destroy']);
     });
     Route::get('/inventories/{id}', [InventoryController::class, 'show']);
+
+    // Equipment - all roles can view, admin/manager can modify
+    Route::get('/equipment', [EquipmentController::class, 'index']);
+    Route::middleware('role:admin,manager')->group(function () {
+        Route::post('/equipment', [EquipmentController::class, 'store']);
+        Route::put('/equipment/{id}', [EquipmentController::class, 'update']);
+        Route::delete('/equipment/{id}', [EquipmentController::class, 'destroy']);
+    });
+    Route::get('/equipment/{id}', [EquipmentController::class, 'show']);
+
+    // Transactions - admin/manager only
+    Route::middleware('role:admin,manager')->group(function () {
+        Route::get('/transactions', [TransactionController::class, 'index']);
+        Route::post('/transactions', [TransactionController::class, 'store']);
+        Route::delete('/transactions/{id}', [TransactionController::class, 'destroy']);
+    });
 
     // Workers - admin/manager only
     Route::middleware('role:admin,manager')->group(function () {
