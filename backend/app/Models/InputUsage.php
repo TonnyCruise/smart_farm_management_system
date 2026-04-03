@@ -11,6 +11,7 @@ class InputUsage extends Model
         'planting_id',
         'input_id',
         'quantity_used',
+        'total_cost',
         'usage_date',
         'notes'
     ];

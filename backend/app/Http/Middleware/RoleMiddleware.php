@@ -7,10 +7,18 @@ use Illuminate\Http\Request;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!$request->user() || $request->user()->role !== $role) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (!$request->user()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $userRole = $request->user()->role;
+        
+        if (!in_array($userRole, $roles)) {
+            return response()->json([
+                'message' => 'Unauthorized. Required roles: ' . implode(', ', $roles)
+            ], 403);
         }
 
         return $next($request);

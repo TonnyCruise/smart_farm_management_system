@@ -14,13 +14,15 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'role' => 'nullable|in:admin,manager,worker'
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role ?? 'worker',
         ]);
 
         $token = $user->createToken('farm_token')->plainTextToken;
@@ -46,6 +48,12 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token
         ]);
+    }
+
+    // Get current user
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
     }
 
     // Logout

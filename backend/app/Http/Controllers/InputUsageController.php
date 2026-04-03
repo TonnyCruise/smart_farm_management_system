@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\InputUsage;
+use App\Models\Input;
 use Illuminate\Http\Request;
 
 class InputUsageController extends Controller
@@ -24,7 +25,28 @@ class InputUsageController extends Controller
             'notes' => 'nullable|string'
         ]);
 
-        $usage = InputUsage::create($request->all());
+        // 🚨 Prevent overuse - check stock
+        $input = Input::findOrFail($request->input_id);
+        if ($input->quantity < $request->quantity_used) {
+            return response()->json(['error' => 'Not enough stock. Available: ' . $input->quantity . ' ' . $input->unit], 400);
+        }
+
+        // 💰 Calculate total cost
+        $total_cost = $request->quantity_used * $input->cost_per_unit;
+
+        // 📉 Deduct inventory
+        $input->quantity -= $request->quantity_used;
+        $input->save();
+
+        // 🧾 Save usage with calculated cost
+        $usage = InputUsage::create([
+            'planting_id' => $request->planting_id,
+            'input_id' => $request->input_id,
+            'quantity_used' => $request->quantity_used,
+            'total_cost' => $total_cost,
+            'usage_date' => $request->usage_date,
+            'notes' => $request->notes
+        ]);
 
         return response()->json($usage, 201);
     }
