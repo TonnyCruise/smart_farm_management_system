@@ -13,7 +13,8 @@ function Animals({ token, canEdit }) {
     breed: "",
     gender: "",
     birth_date: "",
-    health_status: "Healthy"
+    health_status: "Healthy",
+    quantity: 1
   });
 
   const fetchAnimals = () => {
@@ -35,8 +36,8 @@ function Animals({ token, canEdit }) {
   }, [token]);
 
   const handleAdd = () => {
-    if (!form.animal_tag || !form.species || !form.gender || !form.birth_date) {
-      setError("Please fill in all required fields");
+    if (!form.species || !form.gender || !form.birth_date) {
+      setError("Please fill in all required fields (Animal Tag is optional)");
       return;
     }
     
@@ -45,7 +46,7 @@ function Animals({ token, canEdit }) {
     })
       .then(() => {
         fetchAnimals();
-        setForm({ animal_tag: "", species: "", breed: "", gender: "", birth_date: "", health_status: "Healthy" });
+        setForm({ animal_tag: "", species: "", breed: "", gender: "", birth_date: "", health_status: "Healthy", quantity: 1 });
         setError(null);
       })
       .catch(err => {
@@ -189,31 +190,55 @@ function Animals({ token, canEdit }) {
             </h4>
             <div className="form-row">
               <div className="input-group">
-                <label className="input-label">Animal Tag *</label>
+                <label className="input-label">Animal Tag (Optional)</label>
                 <input
                   className="input-field"
-                  placeholder="e.g., COW-001"
+                  placeholder="Auto-generated if blank"
                   value={form.animal_tag}
                   onChange={(e) => setForm({...form, animal_tag: e.target.value})}
+                  disabled={form.quantity > 1}
+                />
+              </div>
+              <div className="input-group">
+                <label className="input-label">Bulk Quantity</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="15000"
+                  className="input-field"
+                  value={form.quantity}
+                  onChange={(e) => setForm({...form, quantity: parseInt(e.target.value) || 1})}
                 />
               </div>
               <div className="input-group">
                 <label className="input-label">Species *</label>
-                <input
+                <select
                   className="input-field"
-                  placeholder="e.g., Cattle"
                   value={form.species}
-                  onChange={(e) => setForm({...form, species: e.target.value})}
-                />
+                  onChange={(e) => setForm({...form, species: e.target.value, breed: ""})}
+                >
+                  <option value="">Select Species</option>
+                  <option value="Sheep">Sheep</option>
+                  <option value="Cattle">Cattle</option>
+                  <option value="Fish">Fish</option>
+                </select>
               </div>
               <div className="input-group">
                 <label className="input-label">Breed</label>
-                <input
+                <select
                   className="input-field"
-                  placeholder="e.g., Friesian"
                   value={form.breed}
                   onChange={(e) => setForm({...form, breed: e.target.value})}
-                />
+                  disabled={!form.species}
+                >
+                  <option value="">Select Breed</option>
+                  {(form.species === "Sheep" ? ["Merino", "Dorper", "Suffolk", "Dorset", "Other"] : 
+                    form.species === "Cattle" ? ["Holstein", "Friesian", "Angus", "Hereford", "Jersey", "Other"] : 
+                    form.species === "Fish" ? ["Tilapia", "Catfish", "Salmon", "Trout", "Other"] : 
+                    ["Other"]).map(b => (
+                      <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
               </div>
               <div className="input-group">
                 <label className="input-label">Gender *</label>

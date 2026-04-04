@@ -19,6 +19,7 @@ function Dashboard({ token, handleLogout }) {
 
   // Modal State
   const [activeModal, setActiveModal] = useState(null); // 'message', 'orders', 'stock', 'add_staff', 'staff_tasks'
+  const [errorPrompt, setErrorPrompt] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [stockInput, setStockInput] = useState({}); // tracking quantities per ID
   const [workerForm, setWorkerForm] = useState({ name: "", role: "", phone: "" });
@@ -32,8 +33,13 @@ function Dashboard({ token, handleLogout }) {
   }, [token]);
 
   const confirmOrder = async (id) => {
-    await API.put(`/orders/${id}/status`, { status: "confirmed" }, { headers: { Authorization: `Bearer ${token}` } });
-    API.get("/orders", { headers: { Authorization: `Bearer ${token}` } }).then(res => setOrders(res.data));
+    try {
+      await API.put(`/orders/${id}/status`, { status: "confirmed" }, { headers: { Authorization: `Bearer ${token}` } });
+      API.get("/orders", { headers: { Authorization: `Bearer ${token}` } }).then(res => setOrders(res.data));
+    } catch (err) {
+      setErrorPrompt(err.response?.data?.message || "Failed to confirm order: Insufficient stock.");
+      API.get("/messages", { headers: { Authorization: `Bearer ${token}` } }).then(res => setMessages(res.data)); // Pull the Low Stock alert message
+    }
   };
 
   const updateInventoryStock = async (id) => {
@@ -167,6 +173,19 @@ function Dashboard({ token, handleLogout }) {
                   ))}
                </div>
              )}
+           </div>
+        </div>
+      )}
+
+      {errorPrompt && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", zIndex: 105, display: "flex", justifyContent: "center", alignItems: "center", backdropFilter: "blur(4px)" }}>
+           <div style={{ background: "white", padding: 32, borderRadius: 16, width: "100%", maxWidth: 440, boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", textAlign: "center", borderTop: "8px solid #ef4444" }}>
+             <div style={{ background: "#fee2e2", color: "#ef4444", width: 64, height: 64, borderRadius: "50%", display: "flex", justifyContent: "center", alignItems: "center", margin: "0 auto 20px" }}>
+               <AlertTriangle size={32} />
+             </div>
+             <h2 style={{ margin: "0 0 12px 0", color: "#1e293b", fontSize: 24, fontWeight: "bold" }}>Action Blocked</h2>
+             <p style={{ color: "#475569", margin: "0 0 24px 0", lineHeight: 1.5, fontSize: 16 }}>{errorPrompt}</p>
+             <button onClick={() => setErrorPrompt(null)} style={{ background: "#ef4444", color: "white", padding: "12px 24px", borderRadius: 8, border: "none", fontWeight: "bold", fontSize: 16, cursor: "pointer", width: "100%", display: "block" }}>Understood</button>
            </div>
         </div>
       )}
