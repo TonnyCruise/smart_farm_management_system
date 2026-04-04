@@ -16,6 +16,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\MessageController;
 
 Route::get('/test', function () {
     return response()->json(['message' => 'API working']);
@@ -123,6 +125,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/transactions', [TransactionController::class, 'store']);
         Route::delete('/transactions/{id}', [TransactionController::class, 'destroy']);
     });
+
+    // Orders and Messages (Accessible to all authenticated roles but filtered down)
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+    
+    Route::get('/messages', [MessageController::class, 'index']);
+    Route::post('/messages', [MessageController::class, 'store']);
 
     // Workers - admin/manager only
     Route::middleware('role:admin,manager')->group(function () {

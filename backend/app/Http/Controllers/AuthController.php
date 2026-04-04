@@ -15,14 +15,14 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'role' => 'nullable|in:admin,manager,worker'
+            'role' => 'nullable|in:admin,manager,worker,customer'
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'worker',
+            'role' => $request->role ?? 'customer',
         ]);
 
         $token = $user->createToken('farm_token')->plainTextToken;
