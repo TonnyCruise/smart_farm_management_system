@@ -22,11 +22,16 @@ import HarvestForm from "./HarvestForm";
 import Workers from "./Workers";
 import Equipment from "./Equipment";
 import Finances from "./Finances";
+import Storefront from "./Storefront";
+import StaffDashboard from "./StaffDashboard";
+import Mailbox from "./Mailbox";
+import Register from "./Register";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [workerCategory, setWorkerCategory] = useState(localStorage.getItem("workerCategory"));
 
   useEffect(() => {
     if (token) {
@@ -56,15 +61,52 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("workerCategory");
     setToken(null);
     setUser(null);
+    setWorkerCategory(null);
   };
 
   if (loading) return <div className="loading-spinner">Loading...</div>;
-  if (!token) return <Login setToken={handleSetToken} />;
+  if (!token) {
+    return (
+      <Routes>
+        <Route path="/register" element={<Register setToken={handleSetToken} />} />
+        <Route path="*" element={<Login setToken={handleSetToken} />} />
+      </Routes>
+    );
+  }
 
+  const isCustomer = user?.role === "customer";
+  const isWorker = user?.role === "worker";
   const isAdmin = user?.role === "admin";
   const isManager = user?.role === "manager";
+
+  const handleCategorySelect = (cat) => {
+    localStorage.setItem("workerCategory", cat);
+    setWorkerCategory(cat);
+  };
+
+  if (isCustomer) {
+    return <Storefront token={token} user={user} onLogout={handleLogout} />;
+  }
+
+  if (isWorker && !workerCategory) {
+    return (
+      <div style={{ padding: "80px 40px", textAlign: "center", background: "#f1f5f9", minHeight: "100vh" }}>
+        <h2 style={{ fontSize: 32, color: "#1e293b", marginBottom: 32 }}>Select Your Department for Today</h2>
+        <div style={{ display: "flex", gap: 20, justifyContent: "center", marginBottom: 40 }}>
+          {["Sheep", "Cattle", "Fish", "Crops"].map(cat => (
+             <button key={cat} onClick={() => handleCategorySelect(cat)} style={{ padding: "20px 40px", fontSize: 24, borderRadius: 16, background: "white", border: "2px solid #e2e8f0", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)" }}>
+               <span style={{ fontSize: 48 }}>{cat === "Sheep" ? "🐑" : cat === "Cattle" ? "🐄" : cat === "Fish" ? "🐟" : "🌾"}</span>
+               <span style={{ fontWeight: 600, color: "#334155" }}>{cat}</span>
+             </button>
+          ))}
+        </div>
+        <button className="btn btn-secondary" onClick={handleLogout}>Logout</button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -73,7 +115,11 @@ function App() {
         
         <div className="main-content">
           <Routes>
-            <Route path="/dashboard" element={<Dashboard token={token} handleLogout={handleLogout} />} />
+            {isWorker ? (
+               <Route path="/dashboard" element={<StaffDashboard token={token} category={workerCategory} user={user} onSwitchCategory={() => handleCategorySelect(null)} />} />
+            ) : (
+               <Route path="/dashboard" element={<Dashboard token={token} handleLogout={handleLogout} />} />
+            )}
             <Route path="/animals" element={<Animals token={token} canEdit={isAdmin || isManager} />} />
             
             <Route path="/fields" element={<Fields token={token} canEdit={isAdmin || isManager} />} />
@@ -106,6 +152,7 @@ function App() {
             
             <Route path="/equipment" element={<Equipment token={token} canEdit={isAdmin || isManager} />} />
             <Route path="/finances" element={isAdmin || isManager ? <Finances token={token} canEdit={isAdmin || isManager} /> : <Navigate to="/dashboard" />} />
+            <Route path="/mailbox" element={<Mailbox token={token} user={user} />} />
             <Route path="/workers" element={isAdmin || isManager ? <Workers token={token} /> : <Navigate to="/dashboard" />} />
             
             <Route path="*" element={<Navigate to="/dashboard" />} />

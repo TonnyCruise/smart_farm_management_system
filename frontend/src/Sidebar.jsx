@@ -11,7 +11,8 @@ import {
   TrendingUp,
   LogOut,
   Wrench,
-  DollarSign
+  DollarSign,
+  Mail
 } from "lucide-react";
 
 function Sidebar({ onLogout, user }) {
@@ -24,6 +25,7 @@ function Sidebar({ onLogout, user }) {
     { to: "/animals", icon: Beef, label: "Livestock", roles: ["admin", "manager", "worker"] },
     { to: "/equipment", icon: Wrench, label: "Equipment", roles: ["admin", "manager", "worker"] },
     { to: "/finances", icon: DollarSign, label: "Finances", roles: ["admin", "manager"] },
+    { to: "/mailbox", icon: Mail, label: "Mailbox", roles: ["admin", "manager", "worker"] },
     { to: "/workers", icon: Users, label: "Workers", roles: ["admin", "manager"] },
     { to: "/inventories", icon: Warehouse, label: "Inventory", roles: ["admin", "manager", "worker"] },
     { to: "/harvests", icon: TrendingUp, label: "Harvests", roles: ["admin", "manager", "worker"] },

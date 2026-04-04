@@ -133,6 +133,31 @@ function Animals({ token, canEdit }) {
         )}
       </div>
 
+      {/* Interjected High-Level Analytics Banner */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, marginBottom: 24 }}>
+          <div style={{ background: "white", padding: "20px 24px", borderRadius: 12, border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <p style={{ margin: "0 0 4px 0", color: "#475569", fontWeight: 600 }}>Sheep Enclosures</p>
+              <h2 style={{ margin: 0, color: "#16a34a", fontSize: 28 }}>{animals.filter(a => a.species.toLowerCase().includes('sheep')).length}</h2>
+            </div>
+            <span style={{ fontSize: 42 }}>🐑</span>
+          </div>
+          <div style={{ background: "white", padding: "20px 24px", borderRadius: 12, border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <p style={{ margin: "0 0 4px 0", color: "#475569", fontWeight: 600 }}>Cattle Enclosures</p>
+              <h2 style={{ margin: 0, color: "#16a34a", fontSize: 28 }}>{animals.filter(a => a.species.toLowerCase().includes('cattle') || a.species.toLowerCase().includes('cow')).length}</h2>
+            </div>
+            <span style={{ fontSize: 42 }}>🐄</span>
+          </div>
+          <div style={{ background: "white", padding: "20px 24px", borderRadius: 12, border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <p style={{ margin: "0 0 4px 0", color: "#475569", fontWeight: 600 }}>Aquaculture Tanks</p>
+              <h2 style={{ margin: 0, color: "#16a34a", fontSize: 28 }}>{animals.filter(a => a.species.toLowerCase().includes('fish')).length}</h2>
+            </div>
+            <span style={{ fontSize: 42 }}>🐟</span>
+          </div>
+      </div>
+
       {error && <div className="alert alert-error">{error}</div>}
 
       <div className="card">
