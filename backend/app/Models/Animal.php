@@ -12,7 +12,8 @@ class Animal extends Model
         'breed',
         'gender',
         'birth_date',
-        'health_status'
+        'health_status',
+        'purchase_price'
     ];
 
     public function healthRecords()

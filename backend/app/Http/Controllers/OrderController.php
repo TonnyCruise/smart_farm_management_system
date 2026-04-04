@@ -53,7 +53,28 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
         $oldStatus = $order->status;
-        $order->status = $request->input('status');
+
+        $targetStatus = $request->input('status');
+
+        if ($targetStatus === 'confirmed') {
+            foreach($order->items as $item) {
+                // Calculate real livestock directly from the registry
+                $stock = \App\Models\Animal::where('species', 'like', "%{$item->category}%")->count();
+                if ($stock < $item->quantity) {
+                    // Send an internal notification about the barrier
+                    \App\Models\Message::create([
+                        'sender_id' => clone $request->user() ? $request->user()->id : null,
+                        'receiver_id' => null,
+                        'subject' => "Low Stock Alert: Order Blocked",
+                        'body' => "Order #{$id} requires {$item->quantity} {$item->category}, but only {$stock} are available currently. Action required to restock."
+                    ]);
+                    
+                    return response()->json(['message' => "Order blocked: Insufficient {$item->category} livestock. Required {$item->quantity}, Available: {$stock}."], 400);
+                }
+            }
+        }
+
+        $order->status = $targetStatus;
         $order->save();
 
         if ($oldStatus !== $order->status) {
